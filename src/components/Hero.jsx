@@ -3,51 +3,33 @@ import Image from 'next/future/image'
 import clsx from 'clsx'
 import Highlight, { defaultProps } from 'prism-react-renderer'
 
+import StackedList from '@/components/StackedList'
 import { Button } from '@/components/Button'
 import { HeroBackground } from '@/components/HeroBackground'
 import blurCyanImage from '@/images/blur-cyan.png'
 import blurIndigoImage from '@/images/blur-indigo.png'
 import ImageWithDetails from '@/components/ImageWithDetails'
+//useSWR allows the use of SWR inside function components
+import useSWR from 'swr'
 
-const files = [
-  {
-    title: 'tailwindui-salient',
-    source: '/salient.png',
-    link: 'https://tailwindui-salient-betoo.vercel.app/',
-  },
-  {
-    title: 'tailwindui-pocket',
-    source: '/pocket.png',
-    link: 'https://tailwindui-pocket-lilac.vercel.app/',
-  },
-  {
-    title: 'tailwindui-keynote',
-    source: '/keynote.png',
-    link: 'https://tailwindui-keynote.vercel.app/',
-  },
-  {
-    title: 'tailwindui-primer',
-    source: '/primer.png',
-    link: 'https://tailwindui-primer-sooty.vercel.app/',
-  },
-  {
-    title: 'tailwindui-spotlight',
-    source: '/spotlight.png',
-    link: 'https://tailwindui-spotlight-mu.vercel.app/',
-  },
-  {
-    title: 'tailwindui-syntax',
-    source: '/syntax.png',
-    link: 'https://tailwindui-syntax-eight.vercel.app/',
-  },
-  {
-    title: 'tailwindui-transmit',
-    source: '/transmit.png',
-    link: 'https://tailwindui-transmit-theta.vercel.app/',
-  },
+//Write a fetcher function to wrap the native fetch function and return the result of a call to url in json format
+const fetcher = (url) => fetch(url).then((res) => res.json())
+function PagesData() {
+  //Set up SWR to run the fetcher function when calling "/api/staticdata"
+  //There are 3 possible states: (1) loading when data is null (2) ready when the data is returned (3) error when there was an error fetching the data
+  const { data, error } = useSWR('/api/readfiles', fetcher)
 
-  // More files...
-]
+  //Handle the error state
+  if (error) return <div>Failed to load</div>
+  //Handle the loading state
+  if (!data) return <div>Loading...</div>
+  //Handle the ready state and display the result contained in the data object mapped to the structure of the json file
+  return (
+    <div>
+      <StackedList dataSet={data} />
+    </div>
+  )
+}
 
 function TrafficLightsIcon(props) {
   return (
@@ -59,7 +41,7 @@ function TrafficLightsIcon(props) {
   )
 }
 
-export function Hero() {
+export function Hero(props) {
   return (
     <div className="overflow-hidden bg-slate-900 dark:-mb-32 dark:mt-[-4.5rem] dark:pb-32 dark:pt-[4.5rem] dark:lg:mt-[-4.75rem] dark:lg:pt-[4.75rem]">
       <div className="py-2 sm:px-2 lg:relative  lg:px-0">
@@ -75,12 +57,10 @@ export function Hero() {
               priority
             />
             <div className="relative">
-              <p className="inline bg-gradient-to-r from-indigo-200 via-sky-400 to-indigo-200 bg-clip-text font-display text-5xl tracking-tight text-transparent">
+              <p className="z-0 inline bg-gradient-to-r from-indigo-200 via-sky-400 to-indigo-200 bg-clip-text font-display text-5xl tracking-tight text-transparent">
                 betoo
                 <br />
-                full functional
-                <br />
-                live ui template
+                shuffle mvp build
               </p>
               <p className="mt-3 text-2xl tracking-tight text-slate-400"></p>
               <div className="mt-8 flex justify-center gap-4 lg:justify-start">
@@ -115,14 +95,16 @@ export function Hero() {
               />
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-sky-300 via-sky-300/70 to-blue-300 opacity-10 blur-lg" />
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-sky-300 via-sky-300/70 to-blue-300 opacity-10" />
-              <div className="relative  rounded-2xl bg-[#0A101F]/80 ring-1 ring-white/10 backdrop-blur">
+              <div className="relative z-40   rounded-2xl bg-[#0A101F]/80 ring-1 ring-white/10 backdrop-blur">
                 <div className="absolute -top-px left-20 right-11 h-px bg-gradient-to-r from-sky-300/0 via-sky-300/70 to-sky-300/0" />
                 <div className="absolute -bottom-px left-11 right-20 h-px bg-gradient-to-r from-blue-400/0 via-blue-400 to-blue-400/0" />
                 <div className="pl-4 pt-4">
                   <TrafficLightsIcon className="h-2.5 w-auto stroke-slate-500/30" />
 
                   <div className="mt-6 flex items-start pr-4 text-sm text-white">
-                    <ImageWithDetails files={files} />
+                    <div className="w-full">
+                      <PagesData />
+                    </div>
                   </div>
                 </div>
               </div>
