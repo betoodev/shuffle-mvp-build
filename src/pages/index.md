@@ -1,6 +1,6 @@
 ---
 title: Getting started
-pageTitle: betoo full functional live ui template
+pageTitle: betoo shuffle mvp build
 description: Cache every single thing your app could ever do ahead of time, so your code never even has to run at all.
 ---
 
